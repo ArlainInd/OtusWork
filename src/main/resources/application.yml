@@ -1,8 +1,5 @@
-server:
-  port: 8080
-
 application:
-  welcometext: "Hello, mr. Evil!"
-  needAnswer: 4
-  csvPath: "src/main/resources/test.csv"
+  welcome-text: "Hello, mr. Evil!"
+  need-answer: 4
+  csv-path: "test.csv"
   locale: "ru_RU"

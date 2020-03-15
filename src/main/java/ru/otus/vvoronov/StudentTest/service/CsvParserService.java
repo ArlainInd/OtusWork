@@ -1,4 +1,4 @@
-package ru.otus.vvoronov.StudentTest.service;
+package ru.otus.vvoronov.studenttest.service;
 
 import java.io.IOException;
 

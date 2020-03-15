@@ -1,6 +1,6 @@
-package ru.otus.vvoronov.StudentTest.service;
+package ru.otus.vvoronov.studenttest.service;
 
-import ru.otus.vvoronov.StudentTest.domain.Student;
+import ru.otus.vvoronov.studenttest.domain.Student;
 import java.io.IOException;
 
 public interface StudyTestingService {

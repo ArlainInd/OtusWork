@@ -1,9 +1,9 @@
-package ru.otus.vvoronov.StudentTest.service;
+package ru.otus.vvoronov.studenttest.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.otus.vvoronov.StudentTest.config.YamlConfig;
-import ru.otus.vvoronov.StudentTest.domain.Student;
+import ru.otus.vvoronov.studenttest.config.YamlConfig;
+import ru.otus.vvoronov.studenttest.domain.Student;
 import java.io.*;
 import java.util.Locale;
 
@@ -19,7 +19,7 @@ public class StudyTestingServiceImpl implements StudyTestingService{
         Student student = new Student();
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        Locale.setDefault(new Locale("ru_RU"/*yamlconfig.getLocale()*/));
+        Locale.setDefault(new Locale(yamlconfig.getLocale()));
 
         System.out.println("Введите вашу фамилию:");
         String lastName = reader.readLine();
@@ -29,7 +29,7 @@ public class StudyTestingServiceImpl implements StudyTestingService{
         student.setFirstName(firstName);
 
         student.setCntOk(csvParser.cvsParseQuest());
-        if (student.getCntOk() >= 4/*yamlconfig.getNeedAnswer()*/) {
+        if (student.getCntOk() >= yamlconfig.getNeedAnswer()) {
             student.setIsComplateTest(Boolean.TRUE);
         }
         return student;

@@ -1,14 +1,13 @@
-package ru.otus.vvoronov.StudentTest.service;
+package ru.otus.vvoronov.studenttest.service;
 
 import au.com.bytecode.opencsv.CSVReader;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import ru.otus.vvoronov.StudentTest.config.YamlConfig;
+import ru.otus.vvoronov.studenttest.config.YamlConfig;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 
 @RequiredArgsConstructor
 @Service
@@ -19,11 +18,14 @@ public class CsvParserServiceImpl implements CsvParserService{
     @Override
     public int cvsParseQuest() throws IOException, NullPointerException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Resource resource = new ClassPathResource(yamlconfig.getCsvPath());
+        File file = resource.getFile();
+
         int answer = 0;
         int goodAnswer = 0;
         int checkAnswer = 0;
 
-        CSVReader csvreader = new CSVReader(new FileReader("src/main/resources/test.csv"/*yamlconfig.getCsvPath()*/), COMMA_DELIMITER, '"', 1);
+        CSVReader csvreader = new CSVReader(new FileReader(file), COMMA_DELIMITER, '"', 1);
         String[] nextLine;
         while ((nextLine = csvreader.readNext()) != null) {
             if (nextLine != null) {

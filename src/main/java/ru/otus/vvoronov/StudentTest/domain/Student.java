@@ -1,4 +1,4 @@
-package ru.otus.vvoronov.StudentTest.domain;
+package ru.otus.vvoronov.studenttest.domain;
 
 import lombok.Data;
 
