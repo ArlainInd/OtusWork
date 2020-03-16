@@ -1,0 +1,5 @@
+application:
+  welcome-text: "Hello, mr. Evil!"
+  need-answer: 4
+  csv-path: "test.csv"
+  locale: "ru_RU"
