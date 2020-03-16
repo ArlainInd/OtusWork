@@ -6,12 +6,12 @@ import lombok.Data;
 public class Student {
     private String lastName;
     private String firstName;
-    private Boolean isComplateTest;
+    private Boolean testCompleted;
     private int cntOk;
 
     public String toString() {
         String res = "";
-        if (isComplateTest == Boolean.TRUE) {
+        if (testCompleted == Boolean.TRUE) {
             res = "успешно пройден";
         }
         else {

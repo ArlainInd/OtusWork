@@ -1,6 +1,7 @@
 package ru.otus.vvoronov.studenttest.service;
 
 import au.com.bytecode.opencsv.CSVReader;
+import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -14,10 +15,10 @@ import java.io.*;
 public class CsvParserServiceImpl implements CsvParserService{
     private static final char COMMA_DELIMITER = ';';
     private final YamlConfig yamlconfig;
+    //private final ReadInfoService readInfoService;
 
     @Override
-    public int cvsParseQuest() throws IOException, NullPointerException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    public int cvsParseQuest(ReadInfoService readInfoService) throws Exception {
         Resource resource = new ClassPathResource(yamlconfig.getCsvPath());
         File file = resource.getFile();
 
@@ -25,7 +26,7 @@ public class CsvParserServiceImpl implements CsvParserService{
         int goodAnswer = 0;
         int checkAnswer = 0;
 
-        CSVReader csvreader = new CSVReader(new FileReader(file), COMMA_DELIMITER, '"', 1);
+        @Cleanup CSVReader csvreader = new CSVReader(new FileReader(file), COMMA_DELIMITER, '"', 1);
         String[] nextLine;
         while ((nextLine = csvreader.readNext()) != null) {
             if (nextLine != null) {
@@ -37,7 +38,7 @@ public class CsvParserServiceImpl implements CsvParserService{
                 System.out.println("4.) " + nextLine[4]);
                 goodAnswer = Integer.parseInt(nextLine[5]);
                 //ввод ответа пользователя
-                answer = Integer.parseInt(reader.readLine());
+                answer = readInfoService.readAnswer();
                 //сравнение с правильным
                 if (answer == goodAnswer) {
                     checkAnswer++;

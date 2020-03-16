@@ -1,7 +1,6 @@
 package ru.otus.vvoronov.studenttest.service;
 
-import java.io.IOException;
-
 public interface CsvParserService {
-    int cvsParseQuest() throws IOException, NullPointerException;
+    int cvsParseQuest(ReadInfoService readInfoService) throws Exception;
+
 }

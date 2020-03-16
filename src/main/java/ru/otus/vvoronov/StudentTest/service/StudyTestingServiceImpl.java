@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.otus.vvoronov.studenttest.config.YamlConfig;
 import ru.otus.vvoronov.studenttest.domain.Student;
-import java.io.*;
 import java.util.Locale;
 
 @RequiredArgsConstructor
@@ -13,24 +12,24 @@ public class StudyTestingServiceImpl implements StudyTestingService{
 
     private final YamlConfig yamlconfig;
     private final CsvParserService csvParser;
+    //private final ReadInfoService readInfoService;
 
     @Override
-    public Student startTesting() throws IOException, NullPointerException {
+    public Student startTesting(ReadInfoService readInfoService) throws Exception {
         Student student = new Student();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         Locale.setDefault(new Locale(yamlconfig.getLocale()));
 
         System.out.println("Введите вашу фамилию:");
-        String lastName = reader.readLine();
+        String lastName = readInfoService.readName();
         student.setLastName(lastName);
         System.out.println("Введите ваше имя:");
-        String firstName = reader.readLine();
+        String firstName = readInfoService.readName();
         student.setFirstName(firstName);
 
-        student.setCntOk(csvParser.cvsParseQuest());
+        student.setCntOk(csvParser.cvsParseQuest(readInfoService));
         if (student.getCntOk() >= yamlconfig.getNeedAnswer()) {
-            student.setIsComplateTest(Boolean.TRUE);
+            student.setTestCompleted(Boolean.TRUE);
         }
         return student;
     }
