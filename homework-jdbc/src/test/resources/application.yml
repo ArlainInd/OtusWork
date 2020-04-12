@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    initialization-mode: always
+    show-sql: true
+    generate-ddl: false
+    sqlScriptEncoding: UTF-8
+  shell:
+    interactive:
+      enabled: false
+logging:
+  level:
+    ru.otus.homework: INFO
+    org.springframework.jdbc: INFO
