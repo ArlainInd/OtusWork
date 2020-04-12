@@ -3,25 +3,23 @@ package ru.otus.homework.jdbc.dao;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.otus.homework.jdbc.JdbcMainApplication;
 import ru.otus.homework.jdbc.domain.Author;
 
-import javax.xml.crypto.Data;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@SpringBootTest
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = JdbcMainApplication.class)
 public class AuthorsDaoImplTest {
 
     @Autowired
@@ -58,13 +56,13 @@ public class AuthorsDaoImplTest {
 
     @Test
     public void updateAuthorTest() {
-        Author author = new Author(1000L, "Станислав Лем", null, "Польша", new ArrayList<>());
-        authorsDao.update(author, 1000L);
-        Map<Long, Author> author1 = authorsDao.getById(1000L);
+        Author author = new Author(3002L, "Станислав Лем", null, "Польша", new ArrayList<>());
+        authorsDao.update(author, 3002L);
+        Map<Long, Author> author1 = authorsDao.getById(3002L);
         System.out.println(author1);
         assertThat(author1.isEmpty()).isFalse();
-        assertThat(author1.get(1000L).getName()).isEqualTo("Станислав Лем");
-        assertThat(author1.get(1000L).getCounrty()).isEqualTo("Польша");
+        assertThat(author1.get(3002L).getName()).isEqualTo("Станислав Лем");
+        assertThat(author1.get(3002L).getCounrty()).isEqualTo("Польша");
     }
 
     @Test

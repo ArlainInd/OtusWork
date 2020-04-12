@@ -3,6 +3,7 @@ package ru.otus.homework.jdbc.dao;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.otus.homework.jdbc.JdbcMainApplication;
@@ -17,8 +18,8 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@SpringBootTest
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = JdbcMainApplication.class)
 public class BooksDaoImplTest {
 
     @Autowired
@@ -56,7 +57,7 @@ public class BooksDaoImplTest {
         Map<Long, Book> books = booksDao.getAllBookByAuthorId(2001L);
         System.out.println(books);
         assertThat(books.isEmpty()).isFalse();
-        assertThat(books.get(4L).getName()).isEqualTo("Искатели ветра");
+        assertThat(books.get(4L).getName()).isEqualTo("seeker");
         assertThat(books.size()).isEqualTo(1);
     }
 

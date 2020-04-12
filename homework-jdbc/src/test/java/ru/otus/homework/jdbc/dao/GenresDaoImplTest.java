@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.otus.homework.jdbc.JdbcMainApplication;
@@ -15,8 +16,8 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@SpringBootTest
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = JdbcMainApplication.class)
 public class GenresDaoImplTest {
     @Autowired
     private GenresDaoImpl genreDao;
@@ -53,9 +54,8 @@ public class GenresDaoImplTest {
 
     @Test
     public void deleteGenreErr() {
-        genreDao.deleteById(102L);
-        Genre findGenre = genreDao.getById(102L);
-        System.out.println(findGenre);
+        genreDao.deleteById(100L);
+        Genre findGenre = genreDao.getById(100L);
         assertThat(findGenre.getGenreId()).isNotNull();
     }
 

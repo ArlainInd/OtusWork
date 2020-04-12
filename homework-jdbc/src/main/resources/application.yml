@@ -7,7 +7,7 @@ spring:
     sqlScriptEncoding: UTF-8
   shell:
     interactive:
-      enabled: false
+      enabled: true
 logging:
   level:
     ru.otus.homework: INFO
