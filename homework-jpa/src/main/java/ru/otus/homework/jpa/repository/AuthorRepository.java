@@ -9,6 +9,6 @@ public interface AuthorRepository {
     Author saveAuthor(Author author);
     List<Author> findAll();
     Optional<Author> findById(Long authorId);
-    Boolean updateNameById(long id, String name);
+    Boolean update(Author author);
     Boolean deleteById(long id);
 }

@@ -3,7 +3,6 @@ package ru.otus.homework.jpa.repository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.homework.jpa.model.Author;
-import ru.otus.homework.jpa.model.Comment;
 
 import javax.persistence.*;
 import java.util.List;
@@ -17,7 +16,7 @@ public class AuthorRepositoryImpl implements AuthorRepository {
 
     @Override
     public Author saveAuthor(Author author) {
-        if (author.getId() <= 0) {
+        if (author.getId() == null) {
             em.persist(author);
             return author;
         } else {
@@ -44,13 +43,17 @@ public class AuthorRepositoryImpl implements AuthorRepository {
     }
 
     @Override
-    public Boolean updateNameById(long id, String name) {
+    public Boolean update(Author author) {
         try {
             Query query = em.createQuery("update Author a " +
                     "set a.name = :name " +
+                    "    a.birth_date = : date" +
+                    "    a.country = : country" +
                     "where a.id = :id");
-            query.setParameter("name", name);
-            query.setParameter("id", id);
+            query.setParameter("name", author.getName());
+            query.setParameter("date", author.getBirth_date());
+            query.setParameter("country", author.getCountry());
+            query.setParameter("id", author.getId());
             query.executeUpdate();
             return Boolean.TRUE;
         }

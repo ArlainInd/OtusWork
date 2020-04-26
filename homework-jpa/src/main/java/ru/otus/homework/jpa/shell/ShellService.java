@@ -10,6 +10,7 @@ import ru.otus.homework.jpa.model.Comment;
 import ru.otus.homework.jpa.repository.AuthorRepository;
 import ru.otus.homework.jpa.repository.BookRepository;
 import ru.otus.homework.jpa.repository.CommentRepository;
+import ru.otus.homework.jpa.repository.GenreRepository;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -21,6 +22,7 @@ public class ShellService {
     private final BookRepository bookRepository;
     private final CommentRepository commentRepository;
     private final AuthorRepository authorRepository;
+    private final GenreRepository genreRepository;
 
     @ShellMethod(value = "Поиск всех книг каталога", key = {"fab", "findAllBook", "allBook"})
     public String findAllBook() {
@@ -32,21 +34,7 @@ public class ShellService {
         return String.format("Итого найдено книг: %s", books.size());
     }
 
-    @ShellMethod(value = "Добавить комментарий автора к книге", key = {"cc", "createcomment"})
-    public String createComment(Long bookId, Long authorId, String comment) {
-        Optional<Book> book = bookRepository.findBookById(bookId);
-        Optional<Author> author = authorRepository.findById(authorId);
-        Comment commentNew = new Comment(comment, book.get(), author.get());
-        //try {
-        commentRepository.SaveComment(commentNew);
-        return String.format("Успешно добавили комментарий: %s", comment);
-        /*}
-        catch (Exception e) {
-            return "Не смогли добавить комментарий. Возникла ошибка - " + e.getMessage();
-        }*/
-    }
-
-    @ShellMethod(value = "Добавить автра", key = {"ca", "createauthor"})
+    @ShellMethod(value = "Добавить автора", key = {"ca", "createauthor"})
     public String createAuthor(String name, String date, String country) throws ParseException {
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
         Date birthdate = formatter.parse(date);
@@ -66,31 +54,86 @@ public class ShellService {
         return String.format("Итого найдено комментариев: %s", comments.size());
     }
 
-    @ShellMethod(value = "Просмотреть автра", key = {"fa", "findauthor"})
+    @ShellMethod(value = "Просмотреть автора", key = {"fa", "findauthor"})
     public String findAuthorById(Long authorId) {
         Optional<Author> author = authorRepository.findById(authorId);
         return author.toString();
     }
 
-    @ShellMethod(value = "Удалить автра", key = {"da", "delauthor"})
+    @ShellMethod(value = "Удалить автора", key = {"da", "delauthor"})
     public String deleteAuthorById(Long authorId) {
         Boolean bool = authorRepository.deleteById(authorId);
         if (bool) {
-            return "Удалили автора";
+            return String.format("Удалили автора с ИД: %s", authorId);
         }
         else {
-            return "Несмогли удалить автора";
+            return String.format("Не смогли удалить автора с ИД: %s", authorId);
         }
     }
 
-    @ShellMethod(value = "Изменить имя автра", key = {"ua", "updauthor"})
-    public String UpdateAuthorNameById(Long authorId, String name) {
-        Boolean bool = authorRepository.updateNameById(authorId, name);
+    @ShellMethod(value = "Изменить автора", key = {"ua", "updauthor"})
+    public String UpdateAuthorNameById(Long authorId, String name, String date, String country) throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
+        Date birthdate = formatter.parse(date);
+        Author author = new Author(authorId, name, birthdate, country, new ArrayList<>());
+        Boolean bool = authorRepository.update(author);
         if (bool) {
-            return "Обновили автора";
+            return String.format("Обновили автора с ИД: %s", authorId);
         }
         else {
-            return "Несмогли обновить автора";
+            return String.format("Не смогли обновить автора с ИД: %s", authorId);
+        }
+    }
+
+    @ShellMethod(value = "Просмотреть все комментарии в каталоге", key = {"fac", "findallcomment"})
+    public String findAllComment() {
+        List<Comment> comments = commentRepository.findAll();
+        for (Iterator<Comment> iter = comments.iterator(); iter.hasNext();) {
+            Comment comment = iter.next();
+            System.out.println(comment.toString());
+        }
+        return String.format("Итого найдено комментариев в каталоге: %s", comments.size());
+    }
+
+    @ShellMethod(value = "Добавить комментарий к книге", key = {"ic", "inscomment"})
+    public String insertComment(String comment, Long bookId, Long authorId) {
+        Optional<Book> book = bookRepository.findBookById(bookId);
+        if (!book.isPresent()) {
+            return String.format("Не смогли найти книгу с ИД: %s", bookId);
+        }
+        Optional<Author> author = authorRepository.findById(authorId);
+        if (!author.isPresent()) {
+            return String.format("Не смогли найти автора с ИД: %s", authorId);
+        }
+        Comment commentNew = new Comment(comment, book.get(), author.get());
+        Comment commentIns = commentRepository.save(commentNew);
+        return String.format("Успешно добавили комментарий");
+    }
+
+    @ShellMethod(value = "Удалить комментарий", key = {"dc", "delcomment"})
+    public String deleteCommentById(Long commentId) {
+        Boolean bool = commentRepository.deleteById(commentId);
+        if (bool) {
+            return String.format("Удалили комментарий с ИД: %s", commentId);
+        }
+        else {
+            return String.format("Не смогли удалить комментарий с ИД: %s", commentId);
+        }
+    }
+
+    @ShellMethod(value = "Изменить комментарий", key = {"uc", "updcomment"})
+    public String updateCommentById(Long commentId, String name) {
+        Optional<Comment> findComment = commentRepository.findById(commentId);
+        if (!findComment.isPresent()) {
+            return String.format("Не смогли найти комментарий с ИД: %s", commentId);
+        }
+        Comment comment = new Comment(commentId, name, findComment.get().getBook(), findComment.get().getAuthor());
+        Boolean bool = commentRepository.update(comment);
+        if (bool) {
+            return String.format("Обновили комментарий с ИД: %s", commentId);
+        }
+        else {
+            return String.format("Не смогли обновить комментарий с ИД: %s", commentId);
         }
     }
 }

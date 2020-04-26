@@ -33,6 +33,12 @@ public class Book {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "book")
     private List<Comment> comments;
 
+    public Book(String name, Author author, Genre genre) {
+        this.name = name;
+        this.author = author;
+        this.genre = genre;
+    }
+
     @Override
     public String toString() {
         return "Книга: " + "id: " + getId() + " Название: " + getName() + " Автор: " + getAuthor().getName() ;

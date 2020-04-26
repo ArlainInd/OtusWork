@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    initialization-mode: always
+    sqlScriptEncoding: UTF-8
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+
+    show-sql: true
+    properties:
+      hibernate:
+      #format_sql: true
+  shell:
+    interactive:
+      enabled: false
+
+logging:
+  level:
+    ru.otus.homework: INFO
+    org.springframework.jdbc: INFO
