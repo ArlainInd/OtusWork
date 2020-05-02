@@ -3,6 +3,7 @@ package ru.otus.homework.jpa.repository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import ru.otus.homework.jpa.model.Book;
 import ru.otus.homework.jpa.model.Comment;
 
 import javax.persistence.*;
@@ -29,11 +30,8 @@ public class CommentRepositoryImpl implements CommentRepository {
     @Override
     public Boolean deleteById(Long commentId) {
         try {
-            Query query = em.createQuery("delete " +
-                    "from Comment c " +
-                    "where c.id = :id");
-            query.setParameter("id", commentId);
-            query.executeUpdate();
+            Comment comment = em.find(Comment.class, commentId);
+            em.remove(comment);
             return Boolean.TRUE;
         }
         catch (Exception e) {
@@ -44,12 +42,7 @@ public class CommentRepositoryImpl implements CommentRepository {
     @Override
     public Boolean update(Comment comment) {
         try {
-            Query query = em.createQuery("update Comment c " +
-                    "set c.name = :name " +
-                    "where c.id = :id");
-            query.setParameter("name", comment.getName());
-            query.setParameter("id", comment.getId());
-            query.executeUpdate();
+            em.merge(comment);
             return Boolean.TRUE;
         } catch (Exception e) {
             return Boolean.FALSE;
@@ -58,9 +51,9 @@ public class CommentRepositoryImpl implements CommentRepository {
 
     @Override
     public List<Comment> findAllByBookId(Long bookId) {
-        TypedQuery<Comment> query = em.createQuery("select c from Comment c where c.book.id = :id", Comment.class);
-        query.setParameter("id", bookId);
-        return query.getResultList();
+        Book book = em.find(Book.class, bookId);
+        List<Comment> comments = book.getComments();
+        return comments;
     }
 
     @Override
@@ -70,15 +63,7 @@ public class CommentRepositoryImpl implements CommentRepository {
 
     @Override
     public Optional<Comment> findById(Long commentId) {
-        TypedQuery<Comment> query = em.createQuery(
-                "select c from Comment c where c.id = :id"
-                , Comment.class);
-        query.setParameter("id", commentId);
-        try {
-            return Optional.of(query.getSingleResult());
-        } catch (NoResultException e) {
-            return Optional.empty();
-        }
+        return Optional.ofNullable(em.find(Comment.class, commentId));
     }
 
 }

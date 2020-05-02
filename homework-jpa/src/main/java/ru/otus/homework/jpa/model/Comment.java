@@ -25,14 +25,9 @@ public class Comment {
     @JoinColumn(name = "book_id", referencedColumnName = "id")
     private Book book;
 
-    @ManyToOne(targetEntity = Author.class, cascade = CascadeType.ALL)
-    @JoinColumn(name = "author_id", referencedColumnName = "id")
-    private Author author;
-
-    public Comment(String name, Book book, Author author) {
+    public Comment(String name, Book book) {
         this.name = name;
         this.book = book;
-        this.author = author;
     }
 
     @Override

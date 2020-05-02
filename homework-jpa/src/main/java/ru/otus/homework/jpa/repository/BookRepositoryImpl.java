@@ -27,12 +27,7 @@ public class BookRepositoryImpl implements BookRepository {
     @Override
     public Boolean update(Book book) {
         try {
-            Query query = em.createQuery("update Book b " +
-                    "set b.name = :name " +
-                    "where b.id = :id");
-            query.setParameter("name", book.getName());
-            query.setParameter("id", book.getId());
-            query.executeUpdate();
+            em.merge(book);
             return Boolean.TRUE;
         } catch (Exception e) {
             return Boolean.FALSE;
@@ -42,11 +37,8 @@ public class BookRepositoryImpl implements BookRepository {
     @Override
     public Boolean deleteById(Long bookId) {
         try {
-            Query query = em.createQuery("delete " +
-                    "from Book b " +
-                    "where b.id = :id");
-            query.setParameter("id", bookId);
-            query.executeUpdate();
+            Book book = em.find(Book.class, bookId);
+            em.remove(book);
             return Boolean.TRUE;
         }
         catch (Exception e) {
@@ -61,14 +53,6 @@ public class BookRepositoryImpl implements BookRepository {
 
     @Override
     public Optional<Book> findBookById(long bookId) {
-        TypedQuery<Book> query = em.createQuery(
-                "select b from Book b where b.id = :id"
-                , Book.class);
-        query.setParameter("id", bookId);
-        try {
-            return Optional.of(query.getSingleResult());
-        } catch (NoResultException e) {
-            return Optional.empty();
-        }
+        return Optional.ofNullable(em.find(Book.class, bookId));
     }
 }

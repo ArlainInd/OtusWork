@@ -29,7 +29,7 @@ public class Author {
     @Column(name = "country")
     private String country;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "author", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "author", cascade = CascadeType.ALL)
     private List<Book> books;
 
     @Override

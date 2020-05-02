@@ -27,12 +27,7 @@ public class GenreRepositoryImpl implements GenreRepository {
     @Override
     public Boolean update(Genre genre) {
         try {
-            Query query = em.createQuery("update Genre g " +
-                    "set g.name = :name " +
-                    "where g.id = :id");
-            query.setParameter("name", genre.getName());
-            query.setParameter("id", genre.getId());
-            query.executeUpdate();
+            em.merge(genre);
             return Boolean.TRUE;
         } catch (Exception e) {
             return Boolean.FALSE;
@@ -42,11 +37,8 @@ public class GenreRepositoryImpl implements GenreRepository {
     @Override
     public Boolean deleteById(Long genreId) {
         try {
-            Query query = em.createQuery("delete " +
-                    "from Genre g " +
-                    "where g.id = :id");
-            query.setParameter("id", genreId);
-            query.executeUpdate();
+            Genre genre = em.find(Genre.class, genreId);
+            em.remove(genre);
             return Boolean.TRUE;
         }
         catch (Exception e) {
@@ -61,14 +53,6 @@ public class GenreRepositoryImpl implements GenreRepository {
 
     @Override
     public Optional<Genre> findById(Long genreId) {
-        TypedQuery<Genre> query = em.createQuery(
-                "select g from Genre g where g.id = :id"
-                , Genre.class);
-        query.setParameter("id", genreId);
-        try {
-            return Optional.of(query.getSingleResult());
-        } catch (NoResultException e) {
-            return Optional.empty();
-        }
+        return Optional.ofNullable(em.find(Genre.class, genreId));
     }
 }

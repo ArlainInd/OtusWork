@@ -31,30 +31,13 @@ public class AuthorRepositoryImpl implements AuthorRepository {
 
     @Override
     public Optional<Author> findById(Long authorId) {
-        TypedQuery<Author> query = em.createQuery(
-                "select a from Author a where a.id = :id"
-                , Author.class);
-        query.setParameter("id", authorId);
-        try {
-            return Optional.of(query.getSingleResult());
-        } catch (NoResultException e) {
-            return Optional.empty();
-        }
+        return Optional.ofNullable(em.find(Author.class, authorId));
     }
 
     @Override
     public Boolean update(Author author) {
         try {
-            Query query = em.createQuery("update Author a " +
-                    "set a.name = :name " +
-                    "    a.birth_date = : date" +
-                    "    a.country = : country" +
-                    "where a.id = :id");
-            query.setParameter("name", author.getName());
-            query.setParameter("date", author.getBirth_date());
-            query.setParameter("country", author.getCountry());
-            query.setParameter("id", author.getId());
-            query.executeUpdate();
+            em.merge(author);
             return Boolean.TRUE;
         }
         catch (Exception e) {
@@ -65,11 +48,8 @@ public class AuthorRepositoryImpl implements AuthorRepository {
     @Override
     public Boolean deleteById(long id) {
         try {
-            Query query = em.createQuery("delete " +
-                    "from Author a " +
-                    "where a.id = :id");
-            query.setParameter("id", id);
-            query.executeUpdate();
+            Author author = em.find(Author.class, id);
+            em.remove(author);
             return Boolean.TRUE;
         }
         catch (Exception e) {

@@ -36,7 +36,7 @@ class CommentRepositoryImplTest {
     @Test
     void saveTest() {
         Optional<Book> book = bookRepository.findBookById(1L);
-        Comment comment = new Comment("save new comment!", book.orElse(null), book.orElse(null).getAuthor());
+        Comment comment = new Comment("save new comment!", book.orElse(null));
         Comment comIns = commentRepository.save(comment);
         assertThat(comIns.getName()).isEqualTo("save new comment!");
         assertThat(comIns.getBook()).isEqualTo(book.orElse(null));

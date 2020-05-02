@@ -49,7 +49,7 @@ public class ShellService {
         List<Comment> comments = commentRepository.findAllByBookId(bookId);
         for (Iterator<Comment> commentIterator = comments.iterator(); commentIterator.hasNext();) {
             Comment comment = commentIterator.next();
-            System.out.println("Комментраий: " + comment.getName() + " к книге: " + comment.getBook().getName() + " от Автора:" + comment.getAuthor().getName());
+            System.out.println("Комментраий: " + comment.getName() + " к книге: " + comment.getBook().getName());
         }
         return String.format("Итого найдено комментариев: %s", comments.size());
     }
@@ -101,11 +101,7 @@ public class ShellService {
         if (!book.isPresent()) {
             return String.format("Не смогли найти книгу с ИД: %s", bookId);
         }
-        Optional<Author> author = authorRepository.findById(authorId);
-        if (!author.isPresent()) {
-            return String.format("Не смогли найти автора с ИД: %s", authorId);
-        }
-        Comment commentNew = new Comment(comment, book.get(), author.get());
+        Comment commentNew = new Comment(comment, book.get());
         Comment commentIns = commentRepository.save(commentNew);
         return String.format("Успешно добавили комментарий");
     }
@@ -127,7 +123,7 @@ public class ShellService {
         if (!findComment.isPresent()) {
             return String.format("Не смогли найти комментарий с ИД: %s", commentId);
         }
-        Comment comment = new Comment(commentId, name, findComment.get().getBook(), findComment.get().getAuthor());
+        Comment comment = new Comment(commentId, name, findComment.get().getBook());
         Boolean bool = commentRepository.update(comment);
         if (bool) {
             return String.format("Обновили комментарий с ИД: %s", commentId);
