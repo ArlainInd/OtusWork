@@ -1,0 +1,9 @@
+spring:
+  shell:
+    interactive:
+      enabled: false
+
+logging:
+  level:
+    ru.otus.homework: INFO
+    org.springframework.mongodb: INFO

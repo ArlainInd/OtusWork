@@ -1,0 +1,9 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://mongo-root:123@localhost:27017/myDB
+
+logging:
+  level:
+    ru.otus.homework: INFO
+    org.springframework.mongodb: INFO
