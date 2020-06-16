@@ -11,7 +11,6 @@ import ru.otus.homework.mongo.repository.AuthorRepository;
 import ru.otus.homework.mongo.repository.BookRepository;
 import ru.otus.homework.mongo.repository.CommentRepository;
 import ru.otus.homework.mongo.repository.GenreRepository;
-import ru.otus.homework.mongo.service.CascadeDataService;
 
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -24,7 +23,6 @@ public class ShellService {
     private final CommentRepository commentRepository;
     private final AuthorRepository authorRepository;
     private final GenreRepository genreRepository;
-    private final CascadeDataService dataService;
 
     @ShellMethod(value = "Поиск всех книг каталога", key = {"fab", "findAllBook", "allBook"})
     public String findAllBook() {
@@ -46,7 +44,9 @@ public class ShellService {
             return "Такой автор уже есть в каталоге";
         }
         else  {
-            return dataService.saveAuthor(name, localDate0, country);
+            Author authorNew = authorRepository.save(new Author(name, localDate0, country, new ArrayList<>()));
+            authorRepository.save(authorNew);
+            return String.format("Добавили нового автора с ИД: %s", authorNew.getId());
         }
     }
 
@@ -83,7 +83,8 @@ public class ShellService {
         LocalDate localDate2 = LocalDate.parse(authorDate).plusDays(1);
         Optional<Author> author = authorRepository.findByNameAndBirthDateBetween(authorName, localDate1, localDate2);
         if (author.isPresent()) {
-            return dataService.deleteAuthor(authorName, localDate0);
+            authorRepository.delete(author.get());
+            return String.format("Удалили автора с ИД: %s", author.get().getId());
         }
         else {
             return "Автора с такими параметрами нет в каталоге";
@@ -92,13 +93,17 @@ public class ShellService {
     }
 
     @ShellMethod(value = "Изменить автора", key = {"ua", "updauthor"})
-    public String UpdateAuthorNameById(String authorName, String authorDate, String country) throws ParseException {
+    public String UpdateAuthorNameById(String authorID, String authorName, String authorDate, String country) throws ParseException {
         LocalDate localDate0 = LocalDate.parse(authorDate);
         LocalDate localDate1 = LocalDate.parse(authorDate).minusDays(1);
         LocalDate localDate2 = LocalDate.parse(authorDate).plusDays(1);
-        Optional<Author> author = authorRepository.findByNameAndBirthDateBetween(authorName, localDate1, localDate2);
+        Optional<Author> author = authorRepository.findById(authorID);
         if (author.isPresent()) {
-            return dataService.saveAuthor(authorName, localDate0, country);
+            author.get().setName(authorName);
+            author.get().setBirthDate(localDate0);
+            author.get().setCountry(country);
+            authorRepository.save(author.get());
+            return String.format("Обновили данные по автору с ИД: %s", author.get().getId());
         }
         else {
             return "Автора с такими параметрами нет в каталоге";
@@ -117,25 +122,62 @@ public class ShellService {
     @ShellMethod(value = "Добавить комментарий к книге", key = {"ic", "inscomment"})
     public String insertComment(String comment, String bookName, String authorName, String authorDate) {
         LocalDate localDate = LocalDate.parse(authorDate);
-        return dataService.saveComment(null, comment, bookName, authorName, localDate);
+        Optional<Author> author = authorRepository.findByNameAndBirthDateBetween(authorName, localDate.minusDays(1), localDate.plusDays(1));
+        if (author.isPresent()) {
+            Optional<Book> book = bookRepository.findByNameAndAuthor(bookName, author.get());
+            if (book.isPresent()) {
+                Comment commentNew = new Comment(comment, book.get());
+                commentRepository.save(commentNew);
+                return "Успешно добавили комментарий";
+            }
+        }
+        return "Не смогли добавить комментарий";
     }
 
     @ShellMethod(value = "Удалить комментарий к книге", key = {"dc", "delcomment"})
     public String deleteComment(String comment, String bookName, String authorName, String authorDate) {
         LocalDate localDate = LocalDate.parse(authorDate);
-        return dataService.deleteComment(comment, bookName, authorName, localDate);
+
+        Optional<Author> author = authorRepository.findByNameAndBirthDateBetween(authorName, localDate.minusDays(1), localDate.plusDays(1));
+        if (author.isPresent()) {
+            Optional<Book> book = bookRepository.findByNameAndAuthor(bookName, author.get());
+            if (book.isPresent()) {
+                Optional<Comment> commentDel = commentRepository.findByNameAndBook(comment, book.get());
+                if (commentDel.isPresent()) {
+                    commentRepository.delete(commentDel.get());
+                    return "Удалили комментарий";
+                }
+            }
+        }
+
+        return "Не смогли удалить комментарий";
     }
 
     @ShellMethod(value = "Удалить все комментарий к книге", key = {"dac", "delallcomment"})
     public String deleteAllCommentByBook(String bookName, String authorName, String authorDate) {
         LocalDate localDate = LocalDate.parse(authorDate);
-        return dataService.deleteAllComment(bookName, authorName, localDate);
+        Optional<Author> author = authorRepository.findByNameAndBirthDateBetween(authorName, localDate.minusDays(1), localDate.plusDays(1));
+        if (author.isPresent()) {
+            Optional<Book> book = bookRepository.findByNameAndAuthor(bookName, author.get());
+            if (book.isPresent()) {
+                List<Comment> comments = commentRepository.findAllByBook(book.get());
+                commentRepository.deleteAll(comments);
+                return String.format("Успешно удалили все комментарий к книге %s", bookName);
+            }
+        }
+
+        return String.format("Не смогли удалить комментарий к книге %s", bookName);
     }
 
     @ShellMethod(value = "Изменить комментарий", key = {"uc", "updcomment"})
-    public String updateCommentById(String commentOld, String commentNew, String bookName, String authorName, String authorDate) {
-        LocalDate localDate = LocalDate.parse(authorDate);
-        return dataService.saveComment(commentOld, commentNew, bookName, authorName, localDate);
+    public String updateCommentById(String commentID, String commentNew) {
+        Optional<Comment> comment = commentRepository.findById(commentID);
+        if (comment.isPresent()) {
+            comment.get().setName(commentNew);
+            commentRepository.save(comment.get());
+            return String.format("Успешно обновили комментарий с ИД %s", commentID);
+        }
+        return String.format("Комментария с ИД %s не существует в базе", commentID);
     }
 
     @ShellMethod(value = "Добавить книгу автора в каталог", key = {"ab", "addbook"})
@@ -145,11 +187,9 @@ public class ShellService {
         Optional<Author> authorFind = authorRepository.findByNameAndBirthDateBetween(authorName, localDate1, localDate2);
         Optional<Genre> genreFind = genreRepository.findByName(genre);
         if (authorFind.isPresent() && genreFind.isPresent()) {
-            try {
-                return dataService.bookSave(bookName, authorFind.get(), genreFind.get(), new ArrayList<>());
-            } catch (Exception e) {
-                return String.format("Возникла ошибка при добавлении книги: %s", e.getMessage());
-            }
+            Book bookSave = new Book(bookName, authorFind.get(), genreFind.get());
+            bookRepository.save(bookSave);
+            return String.format("Добавили новую книгу с ИД: %s", bookSave.getId());
         }
         else {
             return "Неправильные данные для добавления книги";
@@ -162,15 +202,12 @@ public class ShellService {
         LocalDate localDate2 = LocalDate.parse(authorDate).plusDays(1);
         Optional<Author> authorFind = authorRepository.findByNameAndBirthDateBetween(authorName, localDate1, localDate2);
         if (authorFind.isPresent()) {
-            try {
-                String isDel = dataService.deleteBook(bookName, authorFind.get());
-                return isDel;
-            } catch (Exception e) {
-                return String.format("Возникла ошибка при удалении книги: %s", e.getMessage());
+            Optional<Book> book = bookRepository.findByNameAndAuthor(bookName, authorFind.get());
+            if (book.isPresent()) {
+                bookRepository.delete(book.get());
+                return String.format("Удалили книгу с ИД: %s", book.get().getId());
             }
         }
-        else {
-            return "Неправильно указан автор книги";
-        }
+        return String.format("Не смогли удалить книгу %s", bookName);
     }
 }
