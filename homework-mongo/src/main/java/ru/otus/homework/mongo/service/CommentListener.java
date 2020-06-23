@@ -87,26 +87,24 @@ public class CommentListener extends AbstractMongoEventListener<Comment> {
                 //в книге найдем эти комментарии в двух местах - "комментарии" и "10 первых комментариев"
                 if (book.get().getComments() != null && book.get().getComments().size() > 0) {
                     List<Comment> comments = book.get().getComments();
-                    for (Comment commentPrev : book.get().getComments()) {
+
+                    Iterator<Comment> iter = comments.iterator();
+                    while (iter.hasNext()) {
+                        Comment commentPrev = iter.next();
                         if (commentPrev.getId().equals(comment.get().getId())) {
-                            if (comments.size() > 1) {comments.remove(commentPrev);}
-                            else {comments.clear();}
+                            iter.remove();
                         }
-                    }
-                    if (comments.size() > 0) {
-                        book.get().setComments(comments);
                     }
                 }
                 if (book.get().getFirstComments() != null && book.get().getFirstComments().size() > 0) {
                     List<Comment> comments = book.get().getFirstComments();
-                    for (Comment commentPrev : book.get().getFirstComments()) {
+
+                    Iterator<Comment> iter = comments.iterator();
+                    while (iter.hasNext()) {
+                        Comment commentPrev = iter.next();
                         if (commentPrev.getId().equals(comment.get().getId())) {
-                            if (comments.size() > 1) {comments.remove(commentPrev);}
-                            else {comments.clear();}
+                            iter.remove();
                         }
-                    }
-                    if (comments.size() > 0) {
-                        book.get().setFirstComments(comments);
                     }
                 }
                 bookRepository.save(book.get());
